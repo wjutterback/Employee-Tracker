@@ -1,5 +1,6 @@
 require('dotenv').config();
-const inquirer = require('inquirer');
+const inquirer = require('./assets/prompt');
+const questions = require('./assets/questions');
 const mysql = require('mysql2');
 
 const connection = mysql.createConnection({
