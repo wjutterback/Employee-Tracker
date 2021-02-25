@@ -11,7 +11,13 @@ const connection = mysql.createConnection({
   database: process.env.database,
 });
 
-connection.connect((err) => {
+connection.connect(async (err) => {
   if (err) throw err;
   console.log(`connected as id ${connection.threadId}`);
+  selection();
 });
+
+const selection = async () => {
+  let action = await inquirer(questions.employeeAction);
+  connection.end();
+};
