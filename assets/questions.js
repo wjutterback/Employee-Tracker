@@ -11,6 +11,7 @@ const selectionChoices = [
 ];
 
 const roleChoices = ['Salesman', 'Engineer', 'Manager', 'Developer', 'Intern'];
+//TODO: Manager Choices needs to be the result of a DB query, stopgap for now
 const managerChoices = ['Will', 'Davis'];
 const employeeAction = [
   {

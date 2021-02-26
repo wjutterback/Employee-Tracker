@@ -3,7 +3,7 @@ function Employee(fname, lname, role, manager) {
   this.first_name = fname;
   this.last_name = lname;
   this.role_id = role;
-  this.manager_id = manager;
+  this.manager = manager;
 }
 
 function Department(name) {

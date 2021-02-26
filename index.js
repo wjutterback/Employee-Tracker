@@ -21,40 +21,51 @@ const connection = mysql.createConnection({
 connection.connect((err) => {
   if (err) throw err;
   console.log(`connected as id ${connection.threadId}`);
-  selection();
+  selectionFunc();
 });
 
-const selection = async () => {
-  let { selection } = await inquirer(questions.employeeAction);
-  console.log(selection);
-  switch (selection) {
-    case 'Exit':
-      console.log('Quitting selection');
-      break;
-    case 'Add Employee':
-      let addEmployee = await inquirer(questions.addEmployee);
-      console.log(addEmployee);
-      const dept = new C.Department(addEmployee.department);
-      let deptId = await department(dept, null);
-      console.log('deptId', deptId);
-      const role = new C.Role(
-        addEmployee.role,
-        addEmployee.salary,
-        deptId.toString()
-      );
-      console.log('role', role);
-      let roleId = await addRole(role);
-      console.log(roleId);
-      const employee = C.Employee(
-        addEmployee.fname,
-        addEmployee.lname,
-        roleId.toString(),
-        addEmployee.manager
-      );
-      await addEmployee(employee);
-      selection();
-      break;
+async function selectionFunc() {
+  try {
+    let { selection } = await inquirer(questions.employeeAction);
+    switch (selection) {
+      case 'Exit':
+        console.log('Quitting selection');
+        connection.end();
+        break;
+      case 'Add Employee':
+        let employeeData = await inquirer(questions.addEmployee);
+        const dept = new C.Department(employeeData.department);
+        let deptId = await department(dept, null);
+        console.log('deptId', deptId);
+        const role = new C.Role(
+          employeeData.role,
+          employeeData.salary,
+          deptId.toString()
+        );
+        let roleId = await addRole(role);
+        const employee = new C.Employee(
+          employeeData.fname,
+          employeeData.lname,
+          roleId.toString(),
+          employeeData.manager
+        );
+        console.log(employee);
+        await addEmployee(employee);
+        // selection();
+        break;
+      case 'View all Employees':
+        viewEmployee();
+        selectionFunc();
+        break;
+      case 'View all Employees By Department':
+        viewEmployee(true);
+        selectionFunc();
+        break;
+      case 'View all Employees By Manager':
+        viewEmployee('', true);
+        selectionFunc();
+    }
+  } catch (error) {
+    console.error(error);
   }
-
-  connection.end();
-};
+}
