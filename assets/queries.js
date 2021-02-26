@@ -37,14 +37,6 @@ exports.Role = Role;
 //   FOREIGN KEY(department_id) REFERENCES department(id)
 //   );
 
-//   CREATE TABLE manager(
-//   id INT AUTO_INCREMENT,
-//   first_name VARCHAR(30),
-//   last_name VARCHAR(30),
-//   PRIMARY KEY(id),
-//   FOREIGN KEY(department_id) REFERENCES department(id)
-//   );
-
 //   CREATE TABLE department(
 //   id INT AUTO_INCREMENT,
 //   name VARCHAR(30)
