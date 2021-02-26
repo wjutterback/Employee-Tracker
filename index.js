@@ -30,8 +30,8 @@ const selection = async () => {
       let addEmployee = await inquirer(questions.addEmployee);
       console.log(addEmployee);
       const dept = new C.Department(addEmployee.department);
-      department(dept);
-      const role = new C.Role(addEmployee.role);
+      let deptID = await department(dept);
+      const role = new C.Role(addEmployee.role, addEmployee.salary, deptID);
       console.log('role', role);
       // const employee = C.Employee(
       //   addEmployee.fname,

@@ -40,6 +40,11 @@ const addEmployee = [
     message: 'What role will the employee assume?',
   },
   {
+    name: 'salary',
+    type: 'input',
+    message: "What is the employee's salary?",
+  },
+  {
     name: 'manager',
     type: 'input',
     message: "Who is the employee's manager?",
