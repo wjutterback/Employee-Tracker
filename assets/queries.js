@@ -1,24 +1,25 @@
-//Tentative constructors for MySQL queries
-function Employee(fname, lname, role, manager) {
-  if (fname) this.first_name = fname;
-  if (lname) this.last_name = lname;
-  if (role) this.role_id = role;
-  if (manager_id) this.manager_id = manager;
+function addEmployee(employee) {
+const query = connection.query(
+  'INSERT INTO employee SET ?',
+  {
+    first_name: employee.first_name,
+    last_name: employee.last_name,
+    role_id: employee.role,
+    manager_id: employee.manager_id
+  },
+  (err, res) => {
+    if (err) throw err;
+    console.log(`${res.affectedRows} employee added`);
+  }
+);
 }
 
-function Department(name) {
-  if (name) this.name = name;
+function viewEmployee() {
+  connection.query('SELECT * FROM employee', (err, res) => {
+    if (err) throw err;
+    console.table(res);
+  });
 }
-
-function Role(title, salary, department) {
-  if (title) this.title = title;
-  if (salary) this.salary = salary;
-  if (department) this.department_id = department;
-}
-
-exports.Employee = Employee;
-exports.Department = Department;
-exports.Role = Role;
 
 // From DB Tables (to reference)
 // CREATE TABLE department(

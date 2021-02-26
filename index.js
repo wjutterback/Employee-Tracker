@@ -18,6 +18,17 @@ connection.connect((err) => {
 });
 
 const selection = async () => {
-  let action = await inquirer(questions.employeeAction);
+  let { selection } = await inquirer(questions.employeeAction);
+  console.log(selection);
+  switch (selection) {
+    case 'Exit':
+      console.log('Quitting selection');
+      break;
+    case 'Add Employee':
+      let addEmployee = await inquirer(questions.addEmployee);
+      console.log(addEmployee);
+      break;
+  }
+
   connection.end();
 };
