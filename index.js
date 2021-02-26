@@ -2,6 +2,8 @@ require('dotenv').config();
 const inquirer = require('./assets/prompt');
 const questions = require('./assets/questions');
 const mysql = require('mysql2');
+const { department, addEmployee, viewEmployee } = require('./assets/queries');
+const C = require('./assets/constructors');
 
 const connection = mysql.createConnection({
   host: process.env.host,
@@ -27,6 +29,16 @@ const selection = async () => {
     case 'Add Employee':
       let addEmployee = await inquirer(questions.addEmployee);
       console.log(addEmployee);
+      const dept = new C.Department(addEmployee.department);
+      department(dept);
+      const role = new C.Role(addEmployee.role);
+      console.log('role', role);
+      // const employee = C.Employee(
+      //   addEmployee.fname,
+      //   addEmployee.lname,
+      //   role,
+      //   manager
+      // );
       break;
   }
 
