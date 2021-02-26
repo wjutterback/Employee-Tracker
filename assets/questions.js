@@ -13,6 +13,8 @@ const selectionChoices = [
 const roleChoices = ['Salesman', 'Engineer', 'Manager', 'Developer', 'Intern'];
 //TODO: Manager Choices needs to be the result of a DB query, stopgap for now
 const managerChoices = ['Will', 'Davis'];
+//TODO: Employee Choices needs to be the result of a DB query, moving on
+const employeeChoices = ['variable'];
 const employeeAction = [
   {
     name: 'selection',
@@ -57,7 +59,17 @@ const addEmployee = [
   },
 ];
 
+const removeEmployee = [
+  {
+    name: 'remove',
+    type: 'list',
+    message: 'Which employee would you like to remove?',
+    choices: employeeChoices,
+  },
+];
+
 const questions = [{}];
 
 exports.employeeAction = employeeAction;
 exports.addEmployee = addEmployee;
+exports.removeEmployee = removeEmployee;

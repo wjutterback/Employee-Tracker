@@ -6,6 +6,7 @@ const {
   department,
   addEmployee,
   viewEmployee,
+  deleteEmployee,
   addRole,
 } = require('./assets/queries');
 const C = require('./assets/constructors');
@@ -18,6 +19,7 @@ const connection = mysql.createConnection({
   database: process.env.database,
 });
 
+//TODO: Move this to queries
 connection.connect((err) => {
   if (err) throw err;
   console.log(`connected as id ${connection.threadId}`);
@@ -51,7 +53,7 @@ async function selectionFunc() {
         );
         console.log(employee);
         await addEmployee(employee);
-        // selection();
+        selectionFunc();
         break;
       case 'View all Employees':
         viewEmployee();
@@ -64,6 +66,18 @@ async function selectionFunc() {
       case 'View all Employees By Manager':
         viewEmployee('', true);
         selectionFunc();
+        break;
+      //TODO: Remove Employee
+      case 'Remove Employee':
+        let erased = await inquirer(questions.removeEmployee);
+        deleteEmployee(erased);
+        break;
+      case 'Update Employee Role':
+        break;
+      case 'Update Employee Manager':
+        break;
+      case 'View All Roles':
+        break;
     }
   } catch (error) {
     console.error(error);

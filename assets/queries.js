@@ -105,8 +105,8 @@ function addEmployee(employee) {
   );
 }
 
-function viewEmployee(department, manager) {
-  if (department === true) {
+function viewEmployee(byDepartment, byManager) {
+  if (byDepartment === true) {
     connection.query(
       `SELECT employee.first_name AS 'First Name', employee.last_name AS 'Last Name', department.name AS 'Department' FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id`,
       (err, res) => {
@@ -115,7 +115,7 @@ function viewEmployee(department, manager) {
         console.table(res);
       }
     );
-  } else if (manager === true) {
+  } else if (byManager === true) {
     connection.query(
       `SELECT employee1.first_name AS 'First Name', employee1.last_name AS 'Last Name', employee.first_name AS Manager FROM employee as employee1 INNER JOIN employee ON employee1.manager_id = employee.id;`,
       (err, res) => {
@@ -130,14 +130,25 @@ function viewEmployee(department, manager) {
       if (err) throw err;
       console.log('');
       console.table(res);
+      console.log('');
     });
   }
+}
+
+function deleteEmployee() {
+  connection.query('SELECT * FROM employee', (err, res) => {
+    if (err) throw err;
+    console.log('');
+    console.table(res);
+    console.log('');
+  });
 }
 module.exports = {
   department: department,
   addEmployee: addEmployee,
   viewEmployee: viewEmployee,
   addRole: addRole,
+  deleteEmployee: deleteEmployee,
 };
 
 // From DB Tables (to reference)
