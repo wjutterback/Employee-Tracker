@@ -11,7 +11,7 @@ const connection = mysql.createConnection({
   database: process.env.database,
 });
 
-connection.connect(async (err) => {
+connection.connect((err) => {
   if (err) throw err;
   console.log(`connected as id ${connection.threadId}`);
   selection();
