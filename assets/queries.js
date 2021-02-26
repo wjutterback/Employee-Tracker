@@ -7,7 +7,7 @@ const connection = mysql.createConnection({
   database: process.env.database,
 });
 
-//Checks MySQL Database for Department, if not, it creates department and finally returns department ID.
+//Checks MySQL Database for Department, if not found, it creates department and finally returns department ID.
 function department(dept) {
   return new Promise(function (resolve, reject) {
     loop();
@@ -67,33 +67,37 @@ function addRole(role) {
   );
   return new Promise(function (resolve, reject) {
     connection.query(
-      `SELECT * FROM role WHERE title = ${role.title} AND salary = ${role.salary};`,
+      `SELECT * FROM role WHERE title = '${role.title}' AND salary = '${role.salary}';`,
       (err, res) => {
         if (err) {
           return reject(err);
         }
-        console.table(res);
-        console.log(res);
-        resolve(res);
+        resolve(res[0].id);
       }
     );
   });
 }
 
 function addEmployee(employee) {
-  connection.query(
-    'INSERT INTO employee SET ?',
-    {
-      first_name: employee.first_name,
-      last_name: employee.last_name,
-      role_id: employee.role,
-      manager_id: employee.manager_id,
-    },
-    (err, res) => {
-      if (err) throw err;
-      console.log(`${res.affectedRows} employee added`);
-    }
-  );
+  return new Promise(function (resolve, reject) {
+    connection.query(
+      'INSERT INTO employee SET ?',
+      {
+        first_name: employee.first_name,
+        last_name: employee.last_name,
+        role_id: employee.role,
+        // manager_id: employee.manager_id,
+      },
+      (err, res) => {
+        if (err) {
+          return reject(err);
+        }
+        console.table(res);
+        resolve(res);
+        console.log(`${res.affectedRows} employee added`);
+      }
+    );
+  });
 }
 
 function viewEmployee() {

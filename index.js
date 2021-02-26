@@ -43,13 +43,16 @@ const selection = async () => {
         deptId.toString()
       );
       console.log('role', role);
-      // addRole(role);
-      // const employee = C.Employee(
-      //   addEmployee.fname,
-      //   addEmployee.lname,
-      //   role,
-      //   manager
-      // );
+      let roleId = await addRole(role);
+      console.log(roleId);
+      const employee = C.Employee(
+        addEmployee.fname,
+        addEmployee.lname,
+        roleId.toString(),
+        addEmployee.manager
+      );
+      await addEmployee(employee);
+      selection();
       break;
   }
 

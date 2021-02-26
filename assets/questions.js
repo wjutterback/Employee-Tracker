@@ -9,6 +9,9 @@ const selectionChoices = [
   'View All Roles',
   'Exit',
 ];
+
+const roleChoices = ['Salesman', 'Engineer', 'Manager', 'Developer', 'Intern'];
+const managerChoices = ['Will', 'Davis'];
 const employeeAction = [
   {
     name: 'selection',
@@ -36,8 +39,9 @@ const addEmployee = [
   },
   {
     name: 'role',
-    type: 'input',
+    type: 'list',
     message: 'What role will the employee assume?',
+    choices: roleChoices,
   },
   {
     name: 'salary',
@@ -46,8 +50,9 @@ const addEmployee = [
   },
   {
     name: 'manager',
-    type: 'input',
+    type: 'list',
     message: "Who is the employee's manager?",
+    choices: managerChoices,
   },
 ];
 
