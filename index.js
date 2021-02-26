@@ -35,11 +35,15 @@ const selection = async () => {
       let addEmployee = await inquirer(questions.addEmployee);
       console.log(addEmployee);
       const dept = new C.Department(addEmployee.department);
-      let deptId = await department(dept);
+      let deptId = await department(dept, null);
       console.log('deptId', deptId);
-      const role = new C.Role(addEmployee.role, addEmployee.salary, deptId);
+      const role = new C.Role(
+        addEmployee.role,
+        addEmployee.salary,
+        deptId.toString()
+      );
       console.log('role', role);
-      addRole(role);
+      // addRole(role);
       // const employee = C.Employee(
       //   addEmployee.fname,
       //   addEmployee.lname,

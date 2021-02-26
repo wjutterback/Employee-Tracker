@@ -7,44 +7,48 @@ const connection = mysql.createConnection({
   database: process.env.database,
 });
 
+//Checks MySQL Database for Department, if not, it creates department and finally returns department ID.
 function department(dept) {
   return new Promise(function (resolve, reject) {
-    connection.query(
-      `SELECT ? FROM department`,
-      { name: dept.name },
-      (err, res) => {
-        if (err) {
-          return reject(err);
+    loop();
+    function loop() {
+      connection.query(
+        `SELECT ? FROM department`,
+        { name: dept.name },
+        (err, res) => {
+          if (err) {
+            return reject(err);
+          }
+          const valueArray = [];
+          res.forEach((i) => {
+            valueArray.push(Object.values(i));
+          });
+          //https://stackoverflow.com/questions/10865025/merge-flatten-an-array-of-arrays
+          const merged = [].concat.apply([], valueArray);
+          if (merged.indexOf(1) !== -1) {
+            console.log(`${dept.name} found in database`);
+            resolve(merged.indexOf(1) + 1);
+          } else {
+            console.log(
+              `${dept.name} not found in database, creating new department`
+            );
+            connection.query(
+              'INSERT INTO department SET ?',
+              {
+                name: dept.name,
+              },
+              (err, res) => {
+                if (err) {
+                  return reject(err);
+                }
+                console.log(`${res.affectedRows} department added`);
+                loop();
+              }
+            );
+          }
         }
-        const valueArray = [];
-        res.forEach((i) => {
-          valueArray.push(Object.values(i));
-        });
-        //https://stackoverflow.com/questions/10865025/merge-flatten-an-array-of-arrays
-        const merged = [].concat.apply([], valueArray);
-        console.log(merged.indexOf(1));
-        console.log('Value array', valueArray);
-        if (merged.indexOf(1) !== -1) {
-          console.log(`${dept.name} found in database`);
-          resolve(merged.indexOf(1));
-        } else {
-          console.log(
-            `${dept.name} not found in database, creating new department`
-          );
-          connection.query(
-            'INSERT INTO department SET ?',
-            {
-              name: dept.name,
-            },
-            (err, res) => {
-              if (err) throw err;
-              console.log(`${res.affectedRows} department added`);
-              department(dept);
-            }
-          );
-        }
-      }
-    );
+      );
+    }
   });
 }
 
@@ -62,12 +66,17 @@ function addRole(role) {
     }
   );
   return new Promise(function (resolve, reject) {
-    connection.query(`SELECT ? FROM role`, { name: role.title }, (err, res) => {
-      if (err) {
-        return reject(err);
+    connection.query(
+      `SELECT * FROM role WHERE title = ${role.title} AND salary = ${role.salary};`,
+      (err, res) => {
+        if (err) {
+          return reject(err);
+        }
+        console.table(res);
+        console.log(res);
+        resolve(res);
       }
-      resolve(`xyz`);
-    });
+    );
   });
 }
 
