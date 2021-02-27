@@ -22,10 +22,10 @@ connection.connect((err) => {
 });
 
 async function selectionFunc() {
+  //TODO: Stretch goal of refactoring without calling getManager/Employees everytime selectionFunc called
+  getManagers();
+  getEmployees();
   try {
-    //Potentially use fs.writeFileSync to write Manager result from DB query;
-    getManagers();
-    getEmployees();
     let { selection } = await inquirer(questions.employeeAction);
     switch (selection) {
       case 'Exit':
@@ -44,7 +44,6 @@ async function selectionFunc() {
           roleId,
           employeeData.manager
         );
-        console.log(employee);
         addEmployee(employee);
         break;
       case 'View all Employees':
@@ -75,7 +74,7 @@ async function selectionFunc() {
 
 function getManagers() {
   connection.query(
-    `SELECT employee.first_name FROM employee LEFT JOIN role ON employee.role_id = role.id WHERE role.title = 'Manager'`,
+    'SELECT employee.first_name FROM employee LEFT JOIN role ON employee.role_id = role.id WHERE role.title = "Manager"',
     (err, res) => {
       if (err) throw err;
       const managerArr = [];
@@ -91,7 +90,7 @@ function getManagers() {
 
 function getEmployees() {
   connection.query(
-    `SELECT CONCAT(employee.first_name, ' ', employee.last_name) FROM employee;`,
+    "SELECT CONCAT(employee.first_name, ' ', employee.last_name) FROM employee;",
     (err, res) => {
       if (err) throw err;
       const employeeArr = [];
@@ -107,8 +106,11 @@ function getEmployees() {
 
 function addEmployee(employee) {
   console.log('employee in queries', employee);
+  const varArray = [employee.manager];
+  console.log(varArray);
   connection.query(
-    `SELECT employee.id FROM employee LEFT JOIN role ON employee.role_id = role.id WHERE role.title = 'Manager' AND employee.first_name = '${employee.manager}'`,
+    'SELECT employee.id FROM employee LEFT JOIN role ON employee.role_id = role.id WHERE role.title = "Manager" AND employee.first_name = ?',
+    varArray,
     (err, res) => {
       if (err) throw err;
       console.log(res);
@@ -135,7 +137,7 @@ function addEmployee(employee) {
 function viewEmployee(byDepartment, byManager) {
   if (byDepartment === true) {
     connection.query(
-      `SELECT employee.first_name AS 'First Name', employee.last_name AS 'Last Name', department.name AS 'Department' FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id`,
+      "SELECT employee.first_name AS 'First Name', employee.last_name AS 'Last Name', department.name AS 'Department' FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id",
       (err, res) => {
         if (err) throw err;
         console.log('');
@@ -146,7 +148,7 @@ function viewEmployee(byDepartment, byManager) {
     );
   } else if (byManager === true) {
     connection.query(
-      `SELECT employee1.first_name AS 'First Name', employee1.last_name AS 'Last Name', employee.first_name AS Manager FROM employee as employee1 INNER JOIN employee ON employee1.manager_id = employee.id;`,
+      "SELECT employee1.first_name AS 'First Name', employee1.last_name AS 'Last Name', employee.first_name AS Manager FROM employee as employee1 INNER JOIN employee ON employee1.manager_id = employee.id;",
       (err, res) => {
         if (err) throw err;
         console.log('');

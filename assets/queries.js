@@ -67,7 +67,8 @@ function addRole(role) {
   );
   return new Promise(function (resolve, reject) {
     connection.query(
-      `SELECT * FROM role WHERE title = '${role.title}' AND salary = '${role.salary}';`,
+      'SELECT * FROM role WHERE ? AND ?',
+      [{ title: role.title }, { salary: role.salary }],
       (err, res) => {
         if (err) {
           return reject(err);
@@ -78,13 +79,17 @@ function addRole(role) {
   });
 }
 
-function deleteEmployee() {
-  connection.query('SELECT * FROM employee', (err, res) => {
-    if (err) throw err;
-    console.log('');
-    console.table(res);
-    console.log('');
-  });
+function deleteEmployee(employee) {
+  connection.query(
+    //do query for ID to delete
+    // 'DELETE FROM employees WHERE ',
+    (err, res) => {
+      if (err) throw err;
+      console.log('');
+      console.table(res);
+      console.log('');
+    }
+  );
 }
 module.exports = {
   department: department,

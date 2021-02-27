@@ -15,8 +15,8 @@ const selectionChoices = [
 ];
 
 const roleChoices = ['Salesman', 'Engineer', 'Manager', 'Developer', 'Intern'];
+//TODO: Managers functions properly but as of yet can only display first name (full name will require pushing into an array, splitting on the space between first/last name to gain the first name for query, potentially)
 const managerChoices = managers;
-//TODO: Employee Choices needs to be the result of a DB query, moving on
 const employeeChoices = employees;
 const employeeAction = [
   {
@@ -70,8 +70,6 @@ const removeEmployee = [
     choices: employeeChoices,
   },
 ];
-
-const questions = [{}];
 
 exports.employeeAction = employeeAction;
 exports.addEmployee = addEmployee;
