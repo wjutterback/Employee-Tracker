@@ -26,11 +26,11 @@ function department(dept) {
           //https://stackoverflow.com/questions/10865025/merge-flatten-an-array-of-arrays
           const merged = [].concat.apply([], valueArray);
           if (merged.indexOf(1) !== -1) {
-            console.log(`${dept.name} found in database`);
+            console.log(`${dept.name} department found in database`);
             resolve(merged.indexOf(1) + 1);
           } else {
             console.log(
-              `${dept.name} not found in database, creating new department`
+              `${dept.name} department not found in database, creating new department`
             );
             connection.query(
               'INSERT INTO department SET ?',
@@ -62,7 +62,6 @@ function addRole(role) {
     },
     (err, res) => {
       if (err) throw err;
-      console.log(`New ${role.title} added`);
     }
   );
   return new Promise(function (resolve, reject) {
@@ -79,22 +78,10 @@ function addRole(role) {
   });
 }
 
-function deleteEmployee(employee) {
-  connection.query(
-    //do query for ID to delete
-    // 'DELETE FROM employees WHERE ',
-    (err, res) => {
-      if (err) throw err;
-      console.log('');
-      console.table(res);
-      console.log('');
-    }
-  );
-}
+
 module.exports = {
   department: department,
   addRole: addRole,
-  deleteEmployee: deleteEmployee,
 };
 
 // From DB Tables (to reference)

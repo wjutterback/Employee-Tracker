@@ -14,7 +14,13 @@ const selectionChoices = [
   'Exit',
 ];
 
-const roleChoices = ['Salesman', 'Engineer', 'Manager', 'Developer', 'Intern'];
+const roleChoices = [
+  'Salesperson',
+  'Engineer',
+  'Manager',
+  'Developer',
+  'Intern',
+];
 //TODO: Managers functions properly but as of yet can only display first name (full name will require pushing into an array, splitting on the space between first/last name to gain the first name for query, potentially)
 const managerChoices = managers;
 const employeeChoices = employees;

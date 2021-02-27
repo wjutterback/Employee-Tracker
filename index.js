@@ -2,7 +2,7 @@ require('dotenv').config();
 const inquirer = require('./assets/prompt');
 const questions = require('./assets/questions');
 const mysql = require('mysql2');
-const { department, deleteEmployee, addRole } = require('./assets/queries');
+const { department, addRole } = require('./assets/queries');
 const C = require('./assets/constructors');
 const fs = require('fs');
 
@@ -55,7 +55,6 @@ async function selectionFunc() {
       case 'View all Employees By Manager':
         viewEmployee('', true);
         break;
-      //TODO: Remove Employee
       case 'Remove Employee':
         let erased = await inquirer(questions.removeEmployee);
         deleteEmployee(erased);
@@ -90,7 +89,7 @@ function getManagers() {
 
 function getEmployees() {
   connection.query(
-    "SELECT CONCAT(employee.first_name, ' ', employee.last_name) FROM employee;",
+    "SELECT CONCAT(employee.first_name, ' ', employee.last_name) FROM employee",
     (err, res) => {
       if (err) throw err;
       const employeeArr = [];
@@ -105,15 +104,12 @@ function getEmployees() {
 }
 
 function addEmployee(employee) {
-  console.log('employee in queries', employee);
   const varArray = [employee.manager];
-  console.log(varArray);
   connection.query(
     'SELECT employee.id FROM employee LEFT JOIN role ON employee.role_id = role.id WHERE role.title = "Manager" AND employee.first_name = ?',
     varArray,
     (err, res) => {
       if (err) throw err;
-      console.log(res);
       connection.query(
         'INSERT INTO employee SET ?',
         {
@@ -126,7 +122,9 @@ function addEmployee(employee) {
           if (err) {
             return reject(err);
           }
-          console.log(`${res.affectedRows} employee added`);
+          console.log(
+            `New employee ${employee.first_name} ${employee.last_name} added`
+          );
           selectionFunc();
         }
       );
@@ -134,10 +132,25 @@ function addEmployee(employee) {
   );
 }
 
+//Functions but menu option does NOT refresh, so you still can "delete" someone that is gone, mysql queries show it gone due to readFileSync persistence I'm guessing
+function deleteEmployee(employee) {
+  console.log(employee);
+  const varArray = employee.remove.split(' ');
+  connection.query(
+    'DELETE FROM employee WHERE employee.first_name = ? and employee.last_name = ?',
+    varArray,
+    (err, res) => {
+      if (err) throw err;
+      console.log(`Removed ${employee.remove} from database`);
+      selectionFunc();
+    }
+  );
+}
+
 function viewEmployee(byDepartment, byManager) {
   if (byDepartment === true) {
     connection.query(
-      "SELECT employee.first_name AS 'First Name', employee.last_name AS 'Last Name', department.name AS 'Department' FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id",
+      "SELECT CONCAT(employee.first_name, ' ', employee.last_name) as 'Employee Name', department.name AS 'Department' FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id;",
       (err, res) => {
         if (err) throw err;
         console.log('');
@@ -148,7 +161,7 @@ function viewEmployee(byDepartment, byManager) {
     );
   } else if (byManager === true) {
     connection.query(
-      "SELECT employee1.first_name AS 'First Name', employee1.last_name AS 'Last Name', employee.first_name AS Manager FROM employee as employee1 INNER JOIN employee ON employee1.manager_id = employee.id;",
+      "SELECT CONCAT(employee1.first_name, ' ', employee1.last_name) as 'Employee Name', employee.first_name AS Manager FROM employee as employee1 INNER JOIN employee ON employee1.manager_id = employee.id;",
       (err, res) => {
         if (err) throw err;
         console.log('');
