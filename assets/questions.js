@@ -77,6 +77,38 @@ const removeEmployee = [
   },
 ];
 
+const updateRole = [
+  {
+    name: 'employee',
+    type: 'list',
+    message: 'Which employee would you like to update?',
+    choices: employeeChoices,
+  },
+  {
+    name: 'updateRole',
+    type: 'list',
+    message: 'Which new role will the employee now assume?',
+    choices: roleChoices,
+  },
+];
+
+const updateManager = [
+  {
+    name: 'employee',
+    type: 'list',
+    message: 'Which employee would you like to update?',
+    choices: employeeChoices,
+  },
+  {
+    name: 'updateManager',
+    type: 'list',
+    message: 'Whos is their new manager?',
+    choices: managerChoices,
+  },
+];
+
 exports.employeeAction = employeeAction;
 exports.addEmployee = addEmployee;
 exports.removeEmployee = removeEmployee;
+exports.updateRole = updateRole;
+exports.updateManager = updateManager;

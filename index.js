@@ -2,7 +2,12 @@ require('dotenv').config();
 const inquirer = require('./assets/prompt');
 const questions = require('./assets/questions');
 const mysql = require('mysql2');
-const { department, addRole } = require('./assets/queries');
+const {
+  department,
+  addRole,
+  updateEmployeeRole,
+  updateEmployeeManager,
+} = require('./assets/queries');
 const C = require('./assets/constructors');
 const fs = require('fs');
 
@@ -59,11 +64,18 @@ async function selectionFunc() {
         let erased = await inquirer(questions.removeEmployee);
         deleteEmployee(erased);
         break;
+      //TODO: Update Employee Role, at queries now
       case 'Update Employee Role':
+        let updatedRole = await inquirer(questions.updateRole);
+        updateEmployeeRole(updatedRole);
         break;
+      //TODO: Update Employee Manager, at queries now
       case 'Update Employee Manager':
+        let updatedManager = await inquirer(questions.updateManager);
+        updateEmployeeManager(updatedManager);
         break;
       case 'View All Roles':
+        viewRoles();
         break;
     }
   } catch (error) {
@@ -132,7 +144,7 @@ function addEmployee(employee) {
   );
 }
 
-//Functions but menu option does NOT refresh, so you still can "delete" someone that is gone, mysql queries show it gone due to readFileSync persistence I'm guessing
+//Functions but menu option does NOT refresh, so you still can "delete" someone, mysql queries show it is gone but due to readFileSync persistence (guessing) it isn't updated until node restarts - tried lots of time-intensive fixes. will be a stretch goal to update list dynamically
 function deleteEmployee(employee) {
   console.log(employee);
   const varArray = employee.remove.split(' ');
@@ -179,4 +191,16 @@ function viewEmployee(byDepartment, byManager) {
       selectionFunc();
     });
   }
+}
+
+function viewRoles() {
+  const roleChoices = [
+    'Salesperson',
+    'Engineer',
+    'Manager',
+    'Developer',
+    'Intern',
+  ];
+  console.table(roleChoices);
+  selectionFunc();
 }

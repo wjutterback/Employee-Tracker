@@ -77,11 +77,30 @@ function addRole(role) {
     );
   });
 }
+//ex: UPDATE table_name SET field1 = new-value1, field2 = new-value2
+function updateEmployeeRole(employee) {
+  connection.query('SELECT * FROM employee', (err, res) => {
+    if (err) throw err;
+    console.log('');
+    console.table(res);
+    console.log('');
+  });
+}
 
+function updateEmployeeManager(employee) {
+  connection.query('SELECT * FROM employee', (err, res) => {
+    if (err) throw err;
+    console.log('');
+    console.table(res);
+    console.log('');
+  });
+}
 
 module.exports = {
   department: department,
   addRole: addRole,
+  updateEmployeeRole: updateEmployeeRole,
+  updateEmployeeManager: updateEmployeeManager,
 };
 
 // From DB Tables (to reference)
