@@ -1,3 +1,6 @@
+const fs = require('fs');
+const managers = JSON.parse(fs.readFileSync('./assets/manager.js'));
+
 const selectionChoices = [
   'View all Employees',
   'View all Employees By Department',
@@ -11,8 +14,7 @@ const selectionChoices = [
 ];
 
 const roleChoices = ['Salesman', 'Engineer', 'Manager', 'Developer', 'Intern'];
-//TODO: Manager Choices needs to be the result of a DB query, stopgap for now
-const managerChoices = ['Will', 'Davis', 'Callie'];
+const managerChoices = managers;
 //TODO: Employee Choices needs to be the result of a DB query, moving on
 const employeeChoices = ['variable'];
 const employeeAction = [

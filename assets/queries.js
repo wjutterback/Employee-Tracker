@@ -1,5 +1,3 @@
-const inquirer = require('./prompt');
-const questions = require('./questions');
 const mysql = require('mysql2');
 const connection = mysql.createConnection({
   host: process.env.host,

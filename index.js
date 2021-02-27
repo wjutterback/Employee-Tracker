@@ -4,6 +4,7 @@ const questions = require('./assets/questions');
 const mysql = require('mysql2');
 const { department, deleteEmployee, addRole } = require('./assets/queries');
 const C = require('./assets/constructors');
+const fs = require('fs');
 
 const connection = mysql.createConnection({
   host: process.env.host,
@@ -22,6 +23,8 @@ connection.connect((err) => {
 
 async function selectionFunc() {
   try {
+    //Potentially use fs.writeFileSync to write Manager result from DB query;
+    getManagers();
     let { selection } = await inquirer(questions.employeeAction);
     switch (selection) {
       case 'Exit':
@@ -69,10 +72,26 @@ async function selectionFunc() {
   }
 }
 
+function getManagers() {
+  connection.query(
+    `SELECT employee.first_name FROM employee LEFT JOIN role ON employee.role_id = role.id WHERE role.title = 'Manager'`,
+    (err, res) => {
+      if (err) throw err;
+      const managerArr = [];
+      res.forEach((manager) => {
+        managerArr.push(Object.values(manager));
+      });
+      //alternative way to turn multiple arrays into one array (different from queries example)
+      const writeArray = [].concat(...managerArr);
+      fs.writeFileSync('./assets/manager.js', JSON.stringify(writeArray));
+    }
+  );
+}
+
 function addEmployee(employee) {
   console.log('employee in queries', employee);
   connection.query(
-    `SELECT employee.first_name, employee.id FROM employee LEFT JOIN role ON employee.role_id = role.id WHERE role.title = 'Manager' AND employee.first_name = '${employee.manager}'`,
+    `SELECT employee.id FROM employee LEFT JOIN role ON employee.role_id = role.id WHERE role.title = 'Manager' AND employee.first_name = '${employee.manager}'`,
     (err, res) => {
       if (err) throw err;
       console.log(res);
