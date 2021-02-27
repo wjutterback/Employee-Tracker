@@ -25,9 +25,9 @@ async function selectionFunc() {
     let { selection } = await inquirer(questions.employeeAction);
     switch (selection) {
       case 'Exit':
-        console.log('Quitting selection');
         connection.end();
-        break;
+        console.log('Goodbye');
+        process.exit();
       case 'Add Employee':
         let employeeData = await inquirer(questions.addEmployee);
         const dept = new C.Department(employeeData.department);
@@ -72,8 +72,7 @@ async function selectionFunc() {
 function addEmployee(employee) {
   console.log('employee in queries', employee);
   connection.query(
-    //TODO: this query will not be accurate/will not work if more than one manager role exists, needs a better query
-    `SELECT * FROM employee WHERE employee.first_name = '${employee.manager}' AND employee.role_id = '1'`,
+    `SELECT employee.first_name, employee.id FROM employee LEFT JOIN role ON employee.role_id = role.id WHERE role.title = 'Manager' AND employee.first_name = '${employee.manager}'`,
     (err, res) => {
       if (err) throw err;
       console.log(res);
