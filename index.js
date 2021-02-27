@@ -25,6 +25,7 @@ async function selectionFunc() {
   try {
     //Potentially use fs.writeFileSync to write Manager result from DB query;
     getManagers();
+    getEmployees();
     let { selection } = await inquirer(questions.employeeAction);
     switch (selection) {
       case 'Exit':
@@ -84,6 +85,22 @@ function getManagers() {
       //alternative way to turn multiple arrays into one array (different from queries example)
       const writeArray = [].concat(...managerArr);
       fs.writeFileSync('./assets/manager.js', JSON.stringify(writeArray));
+    }
+  );
+}
+
+function getEmployees() {
+  connection.query(
+    `SELECT CONCAT(employee.first_name, ' ', employee.last_name) FROM employee;`,
+    (err, res) => {
+      if (err) throw err;
+      const employeeArr = [];
+      res.forEach((employee) => {
+        employeeArr.push(Object.values(employee));
+      });
+      //alternative way to turn multiple arrays into one array (different from queries example)
+      const writeArray = [].concat(...employeeArr);
+      fs.writeFileSync('./assets/employees.js', JSON.stringify(writeArray));
     }
   );
 }
