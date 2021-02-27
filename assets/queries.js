@@ -77,23 +77,63 @@ function addRole(role) {
     );
   });
 }
-//ex: UPDATE table_name SET field1 = new-value1, field2 = new-value2
+
 function updateEmployeeRole(employee) {
-  connection.query('SELECT * FROM employee', (err, res) => {
-    if (err) throw err;
-    console.log('');
-    console.table(res);
-    console.log('');
-  });
+  const varArray = employee.name.split(' ');
+  connection.query(
+    'SELECT employee.role_id FROM employee WHERE employee.first_name = ? AND employee.last_name = ?',
+    varArray,
+    (err, res) => {
+      if (err) throw err;
+      console.log('');
+      console.table(res);
+      console.log('');
+      const employeeRoleId = [employee.updateRole, res[0].role_id];
+      connection.query(
+        'UPDATE role SET role.title = ? WHERE role.id = ?',
+        employeeRoleId,
+        (err, res) => {
+          if (err) throw err;
+          console.log(
+            `${employee.name}'s role updated to ${employee.updateRole}`
+          );
+        }
+      );
+    }
+  );
 }
 
 function updateEmployeeManager(employee) {
-  connection.query('SELECT * FROM employee', (err, res) => {
-    if (err) throw err;
-    console.log('');
-    console.table(res);
-    console.log('');
-  });
+  varArray1 = employee.name.split(' ');
+  varArray2 = employee.updateManager.split(' ');
+  connection.query(
+    'SELECT employee.id FROM employee WHERE employee.first_name = ? AND employee.last_name = ?',
+    varArray1,
+    (err, res) => {
+      if (err) throw err;
+      console.log(res);
+      const employeeId = res[0].id;
+      connection.query(
+        'SELECT employee.id FROM employee WHERE employee.first_name = ? AND employee.last_name = ?',
+        varArray2,
+        (err, res) => {
+          if (err) throw err;
+          const managerId = res[0].id;
+          const updateArr = [managerId, employeeId];
+          connection.query(
+            'UPDATE employee SET employee.manager_id = ? WHERE employee.id = ?',
+            updateArr,
+            (err, res) => {
+              if (err) throw err;
+              console.log(
+                `${employee.name}'s manager updated to ${employee.updateManager}`
+              );
+            }
+          );
+        }
+      );
+    }
+  );
 }
 
 module.exports = {

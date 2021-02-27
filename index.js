@@ -64,12 +64,10 @@ async function selectionFunc() {
         let erased = await inquirer(questions.removeEmployee);
         deleteEmployee(erased);
         break;
-      //TODO: Update Employee Role, at queries now
       case 'Update Employee Role':
         let updatedRole = await inquirer(questions.updateRole);
         updateEmployeeRole(updatedRole);
         break;
-      //TODO: Update Employee Manager, at queries now
       case 'Update Employee Manager':
         let updatedManager = await inquirer(questions.updateManager);
         updateEmployeeManager(updatedManager);
@@ -85,16 +83,15 @@ async function selectionFunc() {
 
 function getManagers() {
   connection.query(
-    'SELECT employee.first_name FROM employee LEFT JOIN role ON employee.role_id = role.id WHERE role.title = "Manager"',
+    "SELECT CONCAT(employee.first_name, ' ', employee.last_name) FROM employee LEFT JOIN role ON employee.role_id = role.id WHERE role.title = 'Manager'",
     (err, res) => {
       if (err) throw err;
       const managerArr = [];
       res.forEach((manager) => {
-        managerArr.push(Object.values(manager));
+        managerArr.push(...Object.values(manager));
       });
       //alternative way to turn multiple arrays into one array (different from queries example)
-      const writeArray = [].concat(...managerArr);
-      fs.writeFileSync('./assets/manager.js', JSON.stringify(writeArray));
+      fs.writeFileSync('./assets/manager.js', JSON.stringify(managerArr));
     }
   );
 }
@@ -106,22 +103,22 @@ function getEmployees() {
       if (err) throw err;
       const employeeArr = [];
       res.forEach((employee) => {
-        employeeArr.push(Object.values(employee));
+        employeeArr.push(...Object.values(employee));
       });
-      //alternative way to turn multiple arrays into one array (different from queries example)
-      const writeArray = [].concat(...employeeArr);
-      fs.writeFileSync('./assets/employees.js', JSON.stringify(writeArray));
+      fs.writeFileSync('./assets/employees.js', JSON.stringify(employeeArr));
     }
   );
 }
 
 function addEmployee(employee) {
-  const varArray = [employee.manager];
+  const varArray = employee.manager.split(' ');
+  console.log(varArray);
   connection.query(
-    'SELECT employee.id FROM employee LEFT JOIN role ON employee.role_id = role.id WHERE role.title = "Manager" AND employee.first_name = ?',
+    'SELECT employee.id FROM employee LEFT JOIN role ON employee.role_id = role.id WHERE role.title = "Manager" AND employee.first_name = ? AND employee.last_name = ?',
     varArray,
     (err, res) => {
       if (err) throw err;
+      console.log(res);
       connection.query(
         'INSERT INTO employee SET ?',
         {
@@ -149,7 +146,7 @@ function deleteEmployee(employee) {
   console.log(employee);
   const varArray = employee.remove.split(' ');
   connection.query(
-    'DELETE FROM employee WHERE employee.first_name = ? and employee.last_name = ?',
+    'DELETE FROM employee WHERE employee.first_name = ? AND employee.last_name = ? AND employee.id = ?',
     varArray,
     (err, res) => {
       if (err) throw err;
@@ -159,6 +156,8 @@ function deleteEmployee(employee) {
   );
 }
 
+//I think the solution to the graphic problems with inquirer are due to the MySQL queries not being treated as async, so the console.tables are bugging out
+// - utilize the new Promise() or the mysql2-promise npm listed in the error.
 function viewEmployee(byDepartment, byManager) {
   if (byDepartment === true) {
     connection.query(
