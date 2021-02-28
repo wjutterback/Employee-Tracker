@@ -6,7 +6,7 @@
 
 > Employee Tracker is an application to manage employees, employee roles, employee salaries, departments, and to view information concerning these subjects at a glance.
 
-## Link to Deployed Application
+## Link to Video Walkthrough
 
 https://youtu.be/6SiO8HQaijo
 
