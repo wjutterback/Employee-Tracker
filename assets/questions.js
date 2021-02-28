@@ -30,8 +30,10 @@ const employeeAction = [
   },
 ];
 
+//Gets question prompts for inquirer based on parameters
 function getQuestions(questions) {
   return new Promise(function (resolve, reject) {
+
     if (questions === 'deleteDept') {
       connection.query(
         'SELECT department.name, department.id FROM department',

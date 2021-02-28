@@ -120,6 +120,7 @@ function deleteEmployee(employee) {
   });
 }
 
+//Updates employee role
 function updateEmployeeRole(employee) {
   return new Promise(function (resolve, reject) {
     const employeeRoleId = [employee.updateRole, employee.name];
@@ -136,6 +137,7 @@ function updateEmployeeRole(employee) {
   });
 }
 
+//Updates Employee's Manager
 function updateEmployeeManager(employee) {
   return new Promise(function (resolve, reject) {
     const updateArr = [employee.updateManager, employee.name];
@@ -152,6 +154,7 @@ function updateEmployeeManager(employee) {
   });
 }
 
+//View employees in terminal based on input (by Department, by Manager, or all employees)
 function viewEmployee(byDepartment, byManager) {
   return new Promise(function (resolve, reject) {
     if (byDepartment === true) {
@@ -188,6 +191,7 @@ function viewEmployee(byDepartment, byManager) {
   });
 }
 
+//List of Roles
 function viewRoles() {
   return new Promise(function (resolve, reject) {
     // Not sure if the below suggestion is even a good idea, unless changing roleChoice from list in prompts to enter in your own roles, which is fine
@@ -203,6 +207,7 @@ function viewRoles() {
   });
 }
 
+//View budgets by department
 function viewBudget() {
   return new Promise(function (resolve, reject) {
     connection.query(
@@ -217,6 +222,7 @@ function viewBudget() {
   });
 }
 
+//Deletes department
 function deleteDepartment(remove) {
   return new Promise(function (resolve, reject) {
     connection.query(
