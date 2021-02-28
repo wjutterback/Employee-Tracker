@@ -50,6 +50,7 @@ function department(dept) {
   });
 }
 
+//Adds role to database and returns role.id
 function addRole(role) {
   connection.query(
     'INSERT INTO role SET ?',
@@ -80,48 +81,39 @@ function addRole(role) {
   });
 }
 
+//Adds a new employee to database
 function addEmployee(employee) {
   return new Promise(function (resolve, reject) {
-    const varArray = employee.manager.split(' ');
-    console.log(varArray);
+    const manager = employee.manager.split(' ');
     connection.query(
-      'SELECT employee.id FROM employee LEFT JOIN role ON employee.role_id = role.id WHERE role.title = "Manager" AND employee.first_name = ? AND employee.last_name = ?',
-      varArray,
+      'INSERT INTO employee SET ?',
+      {
+        first_name: employee.first_name,
+        last_name: employee.last_name,
+        role_id: employee.role_id,
+        manager_id: manager[5],
+      },
       (err, res) => {
         if (err) {
-          return reject(err);
+          reject(err);
         }
-        console.log(res);
-        connection.query(
-          'INSERT INTO employee SET ?',
-          {
-            first_name: employee.first_name,
-            last_name: employee.last_name,
-            role_id: employee.role_id,
-            manager_id: res[0].id,
-          },
-          (err, res) => {
-            if (err) {
-              reject(err);
-            }
-            resolve(
-              console.log(
-                `New employee ${employee.first_name} ${employee.last_name} added`
-              )
-            );
-          }
+        resolve(
+          console.log(
+            `New employee ${employee.first_name} ${employee.last_name} added`
+          )
         );
       }
     );
   });
 }
 
+//Deletes employee from database
 function deleteEmployee(employee) {
   return new Promise(function (resolve, reject) {
     const varArray = employee.remove.split(' ');
     connection.query(
-      'DELETE FROM employee WHERE employee.first_name = ? AND employee.last_name = ?',
-      varArray,
+      'DELETE FROM employee WHERE employee.id = ?',
+      varArray[5],
       (err, res) => {
         if (err) {
           return reject(err);
@@ -135,30 +127,18 @@ function deleteEmployee(employee) {
 function updateEmployeeRole(employee) {
   return new Promise(function (resolve, reject) {
     const varArray = employee.name.split(' ');
+    const employeeRoleId = [employee.updateRole, varArray[5]];
     connection.query(
-      'SELECT employee.role_id FROM employee WHERE employee.first_name = ? AND employee.last_name = ?',
-      varArray,
+      'UPDATE role SET role.title = ? WHERE role.id = ?',
+      employeeRoleId,
       (err, res) => {
         if (err) {
           return reject(err);
         }
-        console.log('');
-        console.table(res);
-        console.log('');
-        const employeeRoleId = [employee.updateRole, res[0].role_id];
-        connection.query(
-          'UPDATE role SET role.title = ? WHERE role.id = ?',
-          employeeRoleId,
-          (err, res) => {
-            if (err) {
-              return reject(err);
-            }
-            resolve(
-              console.log(
-                `${employee.name}'s role updated to ${employee.updateRole}`
-              )
-            );
-          }
+        resolve(
+          console.log(
+            `${employee.name}'s role updated to ${employee.updateRole}`
+          )
         );
       }
     );
@@ -167,38 +147,20 @@ function updateEmployeeRole(employee) {
 
 function updateEmployeeManager(employee) {
   return new Promise(function (resolve, reject) {
-    const employeeName = employee.name.split(' ');
+    const employeeData = employee.name.split(' ');
     const managerName = employee.updateManager.split(' ');
+    const updateArr = [managerName[5], employeeData[5]];
     connection.query(
-      'SELECT employee.id FROM employee WHERE employee.first_name = ? AND employee.last_name = ?',
-      employeeName,
+      'UPDATE employee SET employee.manager_id = ? WHERE employee.id = ?',
+      updateArr,
       (err, res) => {
         if (err) {
           return reject(err);
         }
-        const employeeId = res[0].id;
-        connection.query(
-          'SELECT employee.id FROM employee WHERE employee.first_name = ? AND employee.last_name = ?',
-          managerName,
-          (err, res) => {
-            if (err) throw err;
-            const managerId = res[0].id;
-            const updateArr = [managerId, employeeId];
-            connection.query(
-              'UPDATE employee SET employee.manager_id = ? WHERE employee.id = ?',
-              updateArr,
-              (err, res) => {
-                if (err) {
-                  return reject(err);
-                }
-                resolve(
-                  console.log(
-                    `${employee.name}'s manager updated to ${employee.updateManager}`
-                  )
-                );
-              }
-            );
-          }
+        resolve(
+          console.log(
+            `${employee.name}'s manager updated to ${employee.updateManager}`
+          )
         );
       }
     );
@@ -209,7 +171,7 @@ function viewEmployee(byDepartment, byManager) {
   return new Promise(function (resolve, reject) {
     if (byDepartment === true) {
       connection.query(
-        "SELECT CONCAT(employee.first_name, ' ', employee.last_name) as 'Employee Name', department.name AS 'Department' FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id;",
+        "SELECT CONCAT(employee.first_name, ' ', employee.last_name) as 'Employee Name', department.name AS 'Department' FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id ORDER BY Department ASC",
         (err, res) => {
           if (err) {
             return reject(err);
@@ -219,7 +181,7 @@ function viewEmployee(byDepartment, byManager) {
       );
     } else if (byManager === true) {
       connection.query(
-        "SELECT CONCAT(employee1.first_name, ' ', employee1.last_name) as 'Employee Name', employee.first_name AS Manager FROM employee as employee1 INNER JOIN employee ON employee1.manager_id = employee.id;",
+        "SELECT CONCAT(employee1.first_name, ' ', employee1.last_name) as 'Employee Name', employee.first_name AS Manager FROM employee as employee1 INNER JOIN employee ON employee1.manager_id = employee.id ORDER BY Manager ASC;",
         (err, res) => {
           if (err) {
             return reject(err);
@@ -229,7 +191,7 @@ function viewEmployee(byDepartment, byManager) {
       );
     } else {
       connection.query(
-        "SELECT CONCAT(employee.first_name, ' ', employee.last_name) as 'Employee Name', department.name AS 'Department', role.title AS 'Title', role.salary AS 'Salary', CONCAT(employee1.first_name, ' ', employee1.last_name) as 'Manager' FROM employee INNER JOIN employee as employee1 ON employee.manager_id = employee1.id LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id;",
+        "SELECT CONCAT(employee.first_name, ' ', employee.last_name) as 'Employee Name', department.name AS 'Department', role.title AS 'Title', role.salary AS 'Salary' FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id ORDER BY employee.last_name ASC;",
         (err, res) => {
           if (err) {
             return reject(err);

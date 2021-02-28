@@ -31,7 +31,7 @@ const employeeAction = [
 function getQuestions(questions) {
   return new Promise(function (resolve, reject) {
     connection.query(
-      "SELECT CONCAT(employee.first_name, ' ', employee.last_name) FROM employee",
+      "SELECT CONCAT(employee.first_name, ' ', employee.last_name, ' -- Employee ID: ', employee.id) FROM employee",
       (err, res) => {
         if (err) throw err;
         const employeeChoices = [];
@@ -39,7 +39,7 @@ function getQuestions(questions) {
           employeeChoices.push(...Object.values(employee));
         });
         connection.query(
-          "SELECT CONCAT(employee.first_name, ' ', employee.last_name) FROM employee LEFT JOIN role ON employee.role_id = role.id WHERE role.title = 'Manager'",
+          "SELECT CONCAT(employee.first_name, ' ', employee.last_name, ' -- Employee ID: ', employee.id) FROM employee LEFT JOIN role ON employee.role_id = role.id WHERE role.title = 'Manager'",
           (err, res) => {
             const managerChoices = ['None'];
             res.forEach((manager) => {
