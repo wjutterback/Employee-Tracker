@@ -16,6 +16,7 @@ const selectionChoices = [
   'Update Employee Role',
   'Update Employee Manager',
   'View All Roles',
+  'View Department Budget',
   'Exit',
 ];
 

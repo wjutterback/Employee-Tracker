@@ -11,6 +11,7 @@ const {
   addEmployee,
   viewRoles,
   deleteEmployee,
+  viewBudget,
 } = require('./assets/queries');
 const C = require('./assets/constructors');
 
@@ -84,6 +85,10 @@ async function selectionFunc() {
         break;
       case 'View All Roles':
         await viewRoles();
+        selectionFunc();
+        break;
+      case 'View Department Budget':
+        await viewBudget();
         selectionFunc();
         break;
     }

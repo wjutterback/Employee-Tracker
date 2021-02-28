@@ -218,6 +218,20 @@ function viewRoles() {
   });
 }
 
+function viewBudget() {
+  return new Promise(function (resolve, reject) {
+    connection.query(
+      "SELECT department.name AS 'Department', SUM(role.salary) AS 'Budget' FROM role LEFT JOIN department ON role.department_id = department.id GROUP BY department.name;",
+      (err, res) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve(console.table(res));
+      }
+    );
+  });
+}
+
 module.exports = {
   department: department,
   addRole: addRole,
@@ -227,6 +241,7 @@ module.exports = {
   addEmployee: addEmployee,
   viewRoles: viewRoles,
   deleteEmployee: deleteEmployee,
+  viewBudget: viewBudget,
 };
 
 // From DB Tables (to reference)
