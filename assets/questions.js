@@ -32,19 +32,29 @@ const employeeAction = [
 function getQuestions(questions) {
   return new Promise(function (resolve, reject) {
     connection.query(
-      "SELECT CONCAT(employee.first_name, ' ', employee.last_name, ' -- Employee ID: ', employee.id) FROM employee",
+      'SELECT employee.first_name, employee.last_name, employee.id FROM employee',
       (err, res) => {
         if (err) throw err;
         const employeeChoices = [];
         res.forEach((employee) => {
-          employeeChoices.push(...Object.values(employee));
+          let obj = {};
+          Object.assign(obj, {
+            name: `${employee.first_name} ${employee.last_name}`,
+          });
+          Object.assign(obj, { value: `${employee.id}` });
+          employeeChoices.push(...[obj]);
         });
         connection.query(
-          "SELECT CONCAT(employee.first_name, ' ', employee.last_name, ' -- Employee ID: ', employee.id) FROM employee LEFT JOIN role ON employee.role_id = role.id WHERE role.title = 'Manager'",
+          "SELECT employee.first_name, employee.last_name, employee.id FROM employee LEFT JOIN role ON employee.role_id = role.id WHERE role.title = 'Manager'",
           (err, res) => {
-            const managerChoices = ['None'];
+            const managerChoices = [{name: 'None', value: null}];
             res.forEach((manager) => {
-              managerChoices.push(...Object.values(manager));
+              let obj = {};
+              Object.assign(obj, {
+                name: `${manager.first_name} ${manager.last_name}`,
+              });
+              Object.assign(obj, { value: `${manager.id}` });
+              managerChoices.push(...[obj]);
             });
 
             const roleChoices = [
