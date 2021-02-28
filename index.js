@@ -7,6 +7,10 @@ const {
   addRole,
   updateEmployeeRole,
   updateEmployeeManager,
+  viewEmployee,
+  addEmployee,
+  viewRoles,
+  deleteEmployee,
 } = require('./assets/queries');
 const C = require('./assets/constructors');
 const fs = require('fs');
@@ -19,7 +23,7 @@ const connection = mysql.createConnection({
   database: process.env.database,
 });
 
-//TODO: Move this to queries
+//TODO: Move this to queries - last step to remove this to queries, solve writeFileSync problem
 connection.connect((err) => {
   if (err) throw err;
   console.log(`connected as id ${connection.threadId}`);
@@ -27,7 +31,7 @@ connection.connect((err) => {
 });
 
 async function selectionFunc() {
-  //TODO: Stretch goal of refactoring without calling getManager/Employees everytime selectionFunc called
+  //TODO: Stretch goal of refactoring without calling getManager/Employees everytime selectionFunc called, tied in with above problem.
   getManagers();
   getEmployees();
   try {
@@ -49,31 +53,39 @@ async function selectionFunc() {
           roleId,
           employeeData.manager
         );
-        addEmployee(employee);
+        await addEmployee(employee);
+        selectionFunc();
         break;
       case 'View all Employees':
-        viewEmployee();
+        await viewEmployee();
+        selectionFunc();
         break;
       case 'View all Employees By Department':
-        viewEmployee(true);
+        await viewEmployee(true);
+        selectionFunc();
         break;
       case 'View all Employees By Manager':
-        viewEmployee('', true);
+        await viewEmployee('', true);
+        selectionFunc();
         break;
       case 'Remove Employee':
         let erased = await inquirer(questions.removeEmployee);
-        deleteEmployee(erased);
+        await deleteEmployee(erased);
+        selectionFunc();
         break;
       case 'Update Employee Role':
         let updatedRole = await inquirer(questions.updateRole);
-        updateEmployeeRole(updatedRole);
+        await updateEmployeeRole(updatedRole);
+        selectionFunc();
         break;
       case 'Update Employee Manager':
         let updatedManager = await inquirer(questions.updateManager);
-        updateEmployeeManager(updatedManager);
+        await updateEmployeeManager(updatedManager);
+        selectionFunc();
         break;
       case 'View All Roles':
-        viewRoles();
+        await viewRoles();
+        selectionFunc();
         break;
     }
   } catch (error) {
@@ -108,98 +120,4 @@ function getEmployees() {
       fs.writeFileSync('./assets/employees.js', JSON.stringify(employeeArr));
     }
   );
-}
-
-function addEmployee(employee) {
-  const varArray = employee.manager.split(' ');
-  console.log(varArray);
-  connection.query(
-    'SELECT employee.id FROM employee LEFT JOIN role ON employee.role_id = role.id WHERE role.title = "Manager" AND employee.first_name = ? AND employee.last_name = ?',
-    varArray,
-    (err, res) => {
-      if (err) throw err;
-      console.log(res);
-      connection.query(
-        'INSERT INTO employee SET ?',
-        {
-          first_name: employee.first_name,
-          last_name: employee.last_name,
-          role_id: employee.role_id,
-          manager_id: res[0].id,
-        },
-        (err, res) => {
-          if (err) {
-            return reject(err);
-          }
-          console.log(
-            `New employee ${employee.first_name} ${employee.last_name} added`
-          );
-          selectionFunc();
-        }
-      );
-    }
-  );
-}
-
-//Functions but menu option does NOT refresh, so you still can "delete" someone, mysql queries show it is gone but due to readFileSync persistence (guessing) it isn't updated until node restarts - tried lots of time-intensive fixes. will be a stretch goal to update list dynamically
-function deleteEmployee(employee) {
-  console.log(employee);
-  const varArray = employee.remove.split(' ');
-  connection.query(
-    'DELETE FROM employee WHERE employee.first_name = ? AND employee.last_name = ? AND employee.id = ?',
-    varArray,
-    (err, res) => {
-      if (err) throw err;
-      console.log(`Removed ${employee.remove} from database`);
-      selectionFunc();
-    }
-  );
-}
-
-//I think the solution to the graphic problems with inquirer are due to the MySQL queries not being treated as async, so the console.tables are bugging out
-// - utilize the new Promise() or the mysql2-promise npm listed in the error.
-function viewEmployee(byDepartment, byManager) {
-  if (byDepartment === true) {
-    connection.query(
-      "SELECT CONCAT(employee.first_name, ' ', employee.last_name) as 'Employee Name', department.name AS 'Department' FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id;",
-      (err, res) => {
-        if (err) throw err;
-        console.log('');
-        console.table(res);
-        console.log('');
-        selectionFunc();
-      }
-    );
-  } else if (byManager === true) {
-    connection.query(
-      "SELECT CONCAT(employee1.first_name, ' ', employee1.last_name) as 'Employee Name', employee.first_name AS Manager FROM employee as employee1 INNER JOIN employee ON employee1.manager_id = employee.id;",
-      (err, res) => {
-        if (err) throw err;
-        console.log('');
-        console.table(res);
-        console.log('');
-        selectionFunc();
-      }
-    );
-  } else {
-    connection.query('SELECT * FROM employee', (err, res) => {
-      if (err) throw err;
-      console.log('');
-      console.table(res);
-      console.log('');
-      selectionFunc();
-    });
-  }
-}
-
-function viewRoles() {
-  const roleChoices = [
-    'Salesperson',
-    'Engineer',
-    'Manager',
-    'Developer',
-    'Intern',
-  ];
-  console.table(roleChoices);
-  selectionFunc();
 }
