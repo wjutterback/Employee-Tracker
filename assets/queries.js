@@ -130,9 +130,7 @@ function updateEmployeeRole(employee) {
         if (err) {
           return reject(err);
         }
-        resolve(
-          console.log(`Employee's role updated!`)
-        );
+        resolve(console.log(`Employee's role updated!`));
       }
     );
   });
@@ -178,7 +176,7 @@ function viewEmployee(byDepartment, byManager) {
       );
     } else {
       connection.query(
-        "SELECT CONCAT(employee.first_name, ' ', employee.last_name) as 'Employee Name', department.name AS 'Department', role.title AS 'Title', role.salary AS 'Salary', CONCAT(employee1.first_name, ' ', employee1.last_name) AS 'Manager' FROM employee LEFT JOIN employee AS employee1 ON employee1.manager_id = employee.id LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id ORDER BY employee.last_name ASC;",
+        "SELECT CONCAT(employee.first_name, ' ', employee.last_name) as 'Employee Name', department.name AS 'Department', role.title AS 'Title', role.salary AS 'Salary', CONCAT(employee1.first_name, ' ', employee1.last_name) AS 'Manager' FROM employee LEFT JOIN employee AS employee1 ON employee.manager_id = employee1.id LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id ORDER BY employee.last_name ASC;",
         (err, res) => {
           if (err) {
             return reject(err);
@@ -208,7 +206,7 @@ function viewRoles() {
 function viewBudget() {
   return new Promise(function (resolve, reject) {
     connection.query(
-      "SELECT CONCAT(employee.first_name, ' ', employee.last_name) as 'Employee Name', department.name AS 'Department', role.title AS 'Title', role.salary AS 'Salary', CONCAT(employee1.first_name, ' ', employee1.last_name) AS 'Manager' FROM employee LEFT JOIN employee AS employee1 ON employee.manager_id = employee1.id LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id ORDER BY employee.last_name ASC;",
+      'SELECT department.name, Sum(role.salary) AS Budget FROM department',
       (err, res) => {
         if (err) {
           return reject(err);
