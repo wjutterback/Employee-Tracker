@@ -64,8 +64,12 @@ function addRole(role) {
   );
   return new Promise(function (resolve, reject) {
     connection.query(
-      'SELECT * FROM role WHERE ? AND ?',
-      [{ title: role.title }, { salary: role.salary }],
+      'SELECT * FROM role WHERE ? AND ? AND ?',
+      [
+        { title: role.title },
+        { salary: role.salary },
+        { department_id: role.department_id },
+      ],
       (err, res) => {
         if (err) {
           return reject(err);
@@ -224,18 +228,22 @@ function viewEmployee(byDepartment, byManager) {
         }
       );
     } else {
-      connection.query('SELECT * FROM employee', (err, res) => {
-        if (err) {
-          return reject(err);
+      connection.query(
+        "SELECT CONCAT(employee.first_name, ' ', employee.last_name) as 'Employee Name', department.name AS 'Department', role.title AS 'Title', role.salary AS 'Salary', CONCAT(employee1.first_name, ' ', employee1.last_name) as 'Manager' FROM employee INNER JOIN employee as employee1 ON employee.manager_id = employee1.id LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id;",
+        (err, res) => {
+          if (err) {
+            return reject(err);
+          }
+          resolve(console.table(res));
         }
-        resolve(console.table(res));
-      });
+      );
     }
   });
 }
 
 function viewRoles() {
   return new Promise(function (resolve, reject) {
+    // Not sure if the below suggestion is even a good idea, unless changing roleChoice from list in prompts to enter in your own roles, which is fine
     //Write code to query server and get just one instance of each role (since salaries create new role for every new salary);
     const roleChoices = [
       'Salesperson',
