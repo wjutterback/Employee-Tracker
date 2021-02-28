@@ -211,7 +211,7 @@ function viewRoles() {
 function viewBudget() {
   return new Promise(function (resolve, reject) {
     connection.query(
-      'SELECT department.name, Sum(role.salary) AS Budget FROM department RIGHT JOIN role on role.department_id = department.id GROUP BY department.name;',
+      "SELECT department.name as 'Department', Sum(role.salary) AS Budget FROM department RIGHT JOIN role on role.department_id = department.id GROUP BY department.name;",
       (err, res) => {
         if (err) {
           return reject(err);
