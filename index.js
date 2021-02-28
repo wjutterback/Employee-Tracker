@@ -12,6 +12,7 @@ const {
   viewRoles,
   deleteEmployee,
   viewBudget,
+  deleteDepartment,
 } = require('./assets/queries');
 const C = require('./assets/constructors');
 
@@ -89,6 +90,12 @@ async function selectionFunc() {
         break;
       case 'View Department Budget':
         await viewBudget();
+        selectionFunc();
+        break;
+      case 'Remove Department':
+        let deleteDeptQuestion = await getQuestions('deleteDept');
+        let deleteDept = await inquirer(deleteDeptQuestion)
+        await deleteDepartment(deleteDept);
         selectionFunc();
         break;
     }

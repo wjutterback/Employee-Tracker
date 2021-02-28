@@ -131,9 +131,7 @@ function updateEmployeeRole(employee) {
           return reject(err);
         }
         resolve(
-          console.log(
-            `Employee's role updated to ${employee.updateRole}`
-          )
+          console.log(`Employee's role updated!`)
         );
       }
     );
@@ -150,11 +148,7 @@ function updateEmployeeManager(employee) {
         if (err) {
           return reject(err);
         }
-        resolve(
-          console.log(
-            `Employee's manager updated!`
-          )
-        );
+        resolve(console.log(`Employee's manager updated!`));
       }
     );
   });
@@ -214,12 +208,25 @@ function viewRoles() {
 function viewBudget() {
   return new Promise(function (resolve, reject) {
     connection.query(
-      "SELECT department.name AS 'Department', SUM(role.salary) AS 'Budget' FROM role LEFT JOIN department ON role.department_id = department.id GROUP BY department.name;",
+      "SELECT CONCAT(employee.first_name, ' ', employee.last_name) as 'Employee Name', department.name AS 'Department', role.title AS 'Title', role.salary AS 'Salary', CONCAT(employee1.first_name, ' ', employee1.last_name) AS 'Manager' FROM employee LEFT JOIN employee AS employee1 ON employee.manager_id = employee1.id LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id ORDER BY employee.last_name ASC;",
       (err, res) => {
         if (err) {
           return reject(err);
         }
         resolve(console.table(res));
+      }
+    );
+  });
+}
+
+function deleteDepartment(remove) {
+  return new Promise(function (resolve, reject) {
+    connection.query(
+      'DELETE FROM department WHERE department.id = ?',
+      remove.dept,
+      (err, res) => {
+        if (err) throw err;
+        resolve(console.log(`Department removed`));
       }
     );
   });
@@ -235,4 +242,5 @@ module.exports = {
   viewRoles: viewRoles,
   deleteEmployee: deleteEmployee,
   viewBudget: viewBudget,
+  deleteDepartment: deleteDepartment,
 };

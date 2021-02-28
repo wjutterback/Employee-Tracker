@@ -1,4 +1,3 @@
-//Tentative constructors for MySQL queries
 function Employee(fname, lname, role, manager) {
   this.first_name = fname;
   this.last_name = lname;
