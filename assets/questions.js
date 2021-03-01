@@ -14,6 +14,7 @@ const selectionChoices = [
   'Add Employee',
   'Remove Employee',
   'Remove Department',
+  'Remove Role',
   'Update Employee Role',
   'Update Employee Manager',
   'View All Roles',
@@ -29,6 +30,7 @@ const employeeAction = [
     choices: selectionChoices,
   },
 ];
+//TODO: Final stretch goal - Update Department and refactor getQuestions
 
 //Gets question prompts for inquirer based on parameters
 function getQuestions(questions) {
@@ -56,6 +58,29 @@ function getQuestions(questions) {
           },
         ];
         resolve(deleteDeptQuestion);
+      });
+    } else if (questions === 'deleteRole') {
+      const selectRole =
+        'SELECT DISTINCT(title), role.id  FROM role GROUP BY title;';
+      connection.query(selectRole, (err, res) => {
+        const roleChoices = [];
+        res.forEach((role) => {
+          let obj = {};
+          Object.assign(obj, {
+            name: `${role.title}`,
+          });
+          Object.assign(obj, { value: `${role.id}` });
+          roleChoices.push(...[obj]);
+        });
+        const deleteRole = [
+          {
+            name: 'role',
+            message: 'Which role would you like to remove?',
+            type: 'list',
+            choices: roleChoices,
+          },
+        ];
+        resolve(deleteRole);
       });
     } else {
       const selectEmployee =

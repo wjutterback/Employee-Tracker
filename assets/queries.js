@@ -221,6 +221,18 @@ function deleteDepartment(remove) {
   });
 }
 
+function deleteRole(remove) {
+  return new Promise(function (resolve, reject) {
+    const sql = 'DELETE FROM role WHERE role.id = ?';
+    connection.query(sql, remove.role, (err, res) => {
+      if (err) {
+        return reject(err);
+      }
+      resolve(console.log(`Role removed`));
+    });
+  });
+}
+
 module.exports = {
   department: department,
   addRole: addRole,
@@ -232,4 +244,5 @@ module.exports = {
   deleteEmployee: deleteEmployee,
   viewBudget: viewBudget,
   deleteDepartment: deleteDepartment,
+  deleteRole: deleteRole,
 };
