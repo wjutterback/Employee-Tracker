@@ -194,16 +194,12 @@ function viewEmployee(byDepartment, byManager) {
 //List of Roles
 function viewRoles() {
   return new Promise(function (resolve, reject) {
-    // Not sure if the below suggestion is even a good idea, unless changing roleChoice from list in prompts to enter in your own roles, which is fine
-    //TODO:Write code to query server and get just one instance of each role (since salaries create new role for every new salary);
-    const roleChoices = [
-      'Salesperson',
-      'Engineer',
-      'Manager',
-      'Developer',
-      'Intern',
-    ];
-    resolve(console.table(roleChoices));
+    connection.query(
+      'SELECT DISTINCT(title) FROM employee_tracker.role;',
+      (err, res) => {
+        resolve(console.table(res));
+      }
+    );
   });
 }
 
