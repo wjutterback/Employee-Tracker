@@ -15,6 +15,8 @@ function Role(title, salary, department) {
   this.department_id = department;
 }
 
-exports.Employee = Employee;
-exports.Department = Department;
-exports.Role = Role;
+module.exports = {
+  Employee: Employee,
+  Department: Department,
+  Role: Role
+}

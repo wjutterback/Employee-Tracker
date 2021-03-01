@@ -12,48 +12,47 @@ function department(dept) {
   return new Promise(function (resolve, reject) {
     loop();
     function loop() {
-      connection.query(
-        `SELECT ? FROM department`,
-        { name: dept.name },
-        (err, res) => {
-          if (err) {
-            return reject(err);
-          }
-          const valueArray = [];
-          res.forEach((i) => {
-            valueArray.push(...Object.values(i));
-          });
-          if (valueArray.indexOf(1) !== -1) {
-            console.log(`${dept.name} department found in database`);
-            resolve(valueArray.indexOf(1) + 1);
-          } else {
-            console.log(
-              `${dept.name} department not found in database, creating new department`
-            );
-            connection.query(
-              'INSERT INTO department SET ?',
-              {
-                name: dept.name,
-              },
-              (err, res) => {
-                if (err) {
-                  return reject(err);
-                }
-                console.log(`${res.affectedRows} department added`);
-                loop();
-              }
-            );
-          }
+      const selectDept = 'SELECT ? FROM department';
+      connection.query(selectDept, { name: dept.name }, (err, res) => {
+        if (err) {
+          return reject(err);
         }
-      );
+        const valueArray = [];
+        res.forEach((i) => {
+          valueArray.push(...Object.values(i));
+        });
+        if (valueArray.indexOf(1) !== -1) {
+          console.log(`${dept.name} department found in database`);
+          resolve(valueArray.indexOf(1) + 1);
+        } else {
+          console.log(
+            `${dept.name} department not found in database, creating new department`
+          );
+          const insertDept = 'INSERT INTO department SET ?';
+          connection.query(
+            insertDept,
+            {
+              name: dept.name,
+            },
+            (err, res) => {
+              if (err) {
+                return reject(err);
+              }
+              console.log(`${res.affectedRows} department added`);
+              loop();
+            }
+          );
+        }
+      });
     }
   });
 }
 
 //Adds role to database and returns role.id
 function addRole(role) {
+  const sql = 'INSERT INTO role SET ?';
   connection.query(
-    'INSERT INTO role SET ?',
+    sql,
     {
       title: role.title,
       salary: role.salary,
@@ -64,8 +63,9 @@ function addRole(role) {
     }
   );
   return new Promise(function (resolve, reject) {
+    const sql = 'SELECT * FROM role WHERE ? AND ? AND ?';
     connection.query(
-      'SELECT * FROM role WHERE ? AND ? AND ?',
+      sql,
       [
         { title: role.title },
         { salary: role.salary },
@@ -84,8 +84,9 @@ function addRole(role) {
 //Adds a new employee to database
 function addEmployee(employee) {
   return new Promise(function (resolve, reject) {
+    const sql = 'INSERT INTO employee SET ?';
     connection.query(
-      'INSERT INTO employee SET ?',
+      sql,
       {
         first_name: employee.first_name,
         last_name: employee.last_name,
@@ -105,18 +106,15 @@ function addEmployee(employee) {
 //Deletes employee from database
 function deleteEmployee(employee) {
   return new Promise(function (resolve, reject) {
-    connection.query(
-      'DELETE FROM employee WHERE employee.id = ?',
-      employee.remove,
-      (err, res) => {
-        if (err) {
-          return reject(
-            'Please remove all employees for this manager before you delete'
-          );
-        }
-        resolve(console.log(`Removed employee from database`));
+    const sql = 'DELETE FROM employee WHERE employee.id = ?';
+    connection.query(sql, employee.remove, (err, res) => {
+      if (err) {
+        return reject(
+          'Please remove all employees for this manager before you delete'
+        );
       }
-    );
+      resolve(console.log(`Removed employee from database`));
+    });
   });
 }
 
@@ -124,16 +122,13 @@ function deleteEmployee(employee) {
 function updateEmployeeRole(employee) {
   return new Promise(function (resolve, reject) {
     const employeeRoleId = [employee.updateRole, employee.name];
-    connection.query(
-      'UPDATE role SET role.title = ? WHERE role.id = ?',
-      employeeRoleId,
-      (err, res) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(console.log(`Employee's role updated!`));
+    const sql = 'UPDATE role SET role.title = ? WHERE role.id = ?';
+    connection.query(sql, employeeRoleId, (err, res) => {
+      if (err) {
+        return reject(err);
       }
-    );
+      resolve(console.log(`Employee's role updated!`));
+    });
   });
 }
 
@@ -141,16 +136,14 @@ function updateEmployeeRole(employee) {
 function updateEmployeeManager(employee) {
   return new Promise(function (resolve, reject) {
     const updateArr = [employee.updateManager, employee.name];
-    connection.query(
-      'UPDATE employee SET employee.manager_id = ? WHERE employee.id = ?',
-      updateArr,
-      (err, res) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(console.log(`Employee's manager updated!`));
+    const sql =
+      'UPDATE employee SET employee.manager_id = ? WHERE employee.id = ?';
+    connection.query(sql, updateArr, (err, res) => {
+      if (err) {
+        return reject(err);
       }
-    );
+      resolve(console.log(`Employee's manager updated!`));
+    });
   });
 }
 
@@ -158,35 +151,32 @@ function updateEmployeeManager(employee) {
 function viewEmployee(byDepartment, byManager) {
   return new Promise(function (resolve, reject) {
     if (byDepartment === true) {
-      connection.query(
-        "SELECT CONCAT(employee.first_name, ' ', employee.last_name) as 'Employee Name', department.name AS 'Department' FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id ORDER BY Department ASC",
-        (err, res) => {
-          if (err) {
-            return reject(err);
-          }
-          resolve(console.table(res));
+      const queryDepartment =
+        "SELECT CONCAT(employee.first_name, ' ', employee.last_name) as 'Employee Name', department.name AS 'Department' FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id ORDER BY Department ASC";
+      connection.query(queryDepartment, (err, res) => {
+        if (err) {
+          return reject(err);
         }
-      );
+        resolve(console.table(res));
+      });
     } else if (byManager === true) {
-      connection.query(
-        "SELECT CONCAT(employee1.first_name, ' ', employee1.last_name) as 'Employee Name', CONCAT(employee.first_name, ' ', employee.last_name) AS 'Manager' FROM employee as employee1 INNER JOIN employee ON employee1.manager_id = employee.id ORDER BY Manager ASC;",
-        (err, res) => {
-          if (err) {
-            return reject(err);
-          }
-          resolve(console.table(res));
+      const queryManager =
+        "SELECT CONCAT(employee1.first_name, ' ', employee1.last_name) as 'Employee Name', CONCAT(employee.first_name, ' ', employee.last_name) AS 'Manager' FROM employee as employee1 INNER JOIN employee ON employee1.manager_id = employee.id ORDER BY Manager ASC;";
+      connection.query(queryManager, (err, res) => {
+        if (err) {
+          return reject(err);
         }
-      );
+        resolve(console.table(res));
+      });
     } else {
-      connection.query(
-        "SELECT CONCAT(employee.first_name, ' ', employee.last_name) as 'Employee Name', department.name AS 'Department', role.title AS 'Title', role.salary AS 'Salary', CONCAT(employee1.first_name, ' ', employee1.last_name) AS 'Manager' FROM employee LEFT JOIN employee AS employee1 ON employee.manager_id = employee1.id LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id ORDER BY employee.last_name ASC;",
-        (err, res) => {
-          if (err) {
-            return reject(err);
-          }
-          resolve(console.table(res));
+      const queryAll =
+        "SELECT CONCAT(employee.first_name, ' ', employee.last_name) as 'Employee Name', department.name AS 'Department', role.title AS 'Title', role.salary AS 'Salary', CONCAT(employee1.first_name, ' ', employee1.last_name) AS 'Manager' FROM employee LEFT JOIN employee AS employee1 ON employee.manager_id = employee1.id LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id ORDER BY employee.last_name ASC;";
+      connection.query(queryAll, (err, res) => {
+        if (err) {
+          return reject(err);
         }
-      );
+        resolve(console.table(res));
+      });
     }
   });
 }
@@ -194,41 +184,40 @@ function viewEmployee(byDepartment, byManager) {
 //List of Roles
 function viewRoles() {
   return new Promise(function (resolve, reject) {
-    connection.query(
-      'SELECT DISTINCT(title) FROM employee_tracker.role;',
-      (err, res) => {
-        resolve(console.table(res));
+    const sql = 'SELECT DISTINCT(title) FROM employee_tracker.role;';
+    connection.query(sql, (err, res) => {
+      if (err) {
+        return reject(err);
       }
-    );
+      resolve(console.table(res));
+    });
   });
 }
 
 //View budgets by department
 function viewBudget() {
   return new Promise(function (resolve, reject) {
-    connection.query(
-      "SELECT department.name as 'Department', Sum(role.salary) AS Budget FROM department RIGHT JOIN role on role.department_id = department.id GROUP BY department.name;",
-      (err, res) => {
-        if (err) {
-          return reject(err);
-        }
-        resolve(console.table(res));
+    const sql =
+      "SELECT department.name as 'Department', Sum(role.salary) AS Budget FROM department RIGHT JOIN role on role.department_id = department.id GROUP BY department.name;";
+    connection.query(sql, (err, res) => {
+      if (err) {
+        return reject(err);
       }
-    );
+      resolve(console.table(res));
+    });
   });
 }
 
 //Deletes department
 function deleteDepartment(remove) {
   return new Promise(function (resolve, reject) {
-    connection.query(
-      'DELETE FROM department WHERE department.id = ?',
-      remove.dept,
-      (err, res) => {
-        if (err) throw err;
-        resolve(console.log(`Department removed`));
+    const sql = 'DELETE FROM department WHERE department.id = ?';
+    connection.query(sql, remove.dept, (err, res) => {
+      if (err) {
+        return reject(err);
       }
-    );
+      resolve(console.log(`Department removed`));
+    });
   });
 }
 

@@ -14,7 +14,7 @@ const {
   viewBudget,
   deleteDepartment,
 } = require('./assets/queries');
-const C = require('./assets/constructors');
+const { Department, Employee, Role } = require('./assets/constructors');
 
 const connection = mysql.createConnection({
   host: process.env.host,
@@ -41,11 +41,11 @@ async function selectionFunc() {
       case 'Add Employee':
         let employeeQuestions = await getQuestions('addEmployeeQuestions');
         let employeeData = await inquirer(employeeQuestions);
-        const dept = new C.Department(employeeData.department);
+        const dept = new Department(employeeData.department);
         let deptId = await department(dept);
-        const role = new C.Role(employeeData.role, employeeData.salary, deptId);
+        const role = new Role(employeeData.role, employeeData.salary, deptId);
         let roleId = await addRole(role);
-        const employee = new C.Employee(
+        const employee = new Employee(
           employeeData.fname,
           employeeData.lname,
           roleId,
@@ -94,7 +94,7 @@ async function selectionFunc() {
         break;
       case 'Remove Department':
         let deleteDeptQuestion = await getQuestions('deleteDept');
-        let deleteDept = await inquirer(deleteDeptQuestion)
+        let deleteDept = await inquirer(deleteDeptQuestion);
         await deleteDepartment(deleteDept);
         selectionFunc();
         break;
