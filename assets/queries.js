@@ -23,7 +23,13 @@ function department(dept) {
         });
         if (valueArray.indexOf(1) !== -1) {
           console.log(`${dept.name} department found in database`);
-          resolve(valueArray.indexOf(1) + 1);
+          const getId = 'SELECT department.id FROM department WHERE name = ?';
+          connection.query(getId, dept.name, (err, res) => {
+            if (err) {
+              return reject(err);
+            }
+            resolve(res[0].id);
+          });
         } else {
           console.log(
             `${dept.name} department not found in database, creating new department`
@@ -214,7 +220,9 @@ function deleteDepartment(remove) {
     const sql = 'DELETE FROM department WHERE department.id = ?';
     connection.query(sql, remove.dept, (err, res) => {
       if (err) {
-        return reject(err);
+        return reject(
+          'Please remove all employees for this department before you delete'
+        );
       }
       resolve(console.log(`Department removed`));
     });
@@ -226,7 +234,9 @@ function deleteRole(remove) {
     const sql = 'DELETE FROM role WHERE role.id = ?';
     connection.query(sql, remove.role, (err, res) => {
       if (err) {
-        return reject(err);
+        return reject(
+          'Please remove or update all employees before you delete this role'
+        );
       }
       resolve(console.log(`Role removed`));
     });
