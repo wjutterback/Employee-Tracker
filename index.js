@@ -1,9 +1,17 @@
 require('dotenv').config();
 const inquirer = require('./assets/prompt');
-const { getQuestions, employeeAction } = require('./assets/questions');
+const {
+  addEmployeeQuestions,
+  employeeAction,
+  updateManager,
+  updateRole,
+  removeEmployee,
+  deleteRoleQ,
+  deleteDeptQuestion,
+} = require('./assets/questions');
 const mysql = require('mysql2');
 const {
-  department,
+  addDepartment,
   addRole,
   updateEmployeeRole,
   updateEmployeeManager,
@@ -40,10 +48,9 @@ async function selectionFunc() {
         console.log('Goodbye');
         process.exit();
       case 'Add Employee':
-        let employeeQuestions = await getQuestions('addEmployeeQuestions');
-        let employeeData = await inquirer(employeeQuestions);
+        let employeeData = await inquirer(addEmployeeQuestions);
         const dept = new Department(employeeData.department);
-        let deptId = await department(dept);
+        let deptId = await addDepartment(dept);
         const role = new Role(employeeData.role, employeeData.salary, deptId);
         let roleId = await addRole(role);
         const employee = new Employee(
@@ -68,20 +75,17 @@ async function selectionFunc() {
         selectionFunc();
         break;
       case 'Remove Employee':
-        let removeQuestion = await getQuestions('removeEmployee');
-        let erased = await inquirer(removeQuestion);
+        let erased = await inquirer(removeEmployee);
         await deleteEmployee(erased);
         selectionFunc();
         break;
       case 'Update Employee Role':
-        let updateQuestion = await getQuestions('updateRole');
-        let updatedRole = await inquirer(updateQuestion);
+        let updatedRole = await inquirer(updateRole);
         await updateEmployeeRole(updatedRole);
         selectionFunc();
         break;
       case 'Update Employee Manager':
-        let managerQuestion = await getQuestions('updateManager');
-        let updatedManager = await inquirer(managerQuestion);
+        let updatedManager = await inquirer(updateManager);
         await updateEmployeeManager(updatedManager);
         selectionFunc();
         break;
@@ -94,14 +98,12 @@ async function selectionFunc() {
         selectionFunc();
         break;
       case 'Remove Department':
-        let deleteDeptQuestion = await getQuestions('deleteDept');
         let deleteDept = await inquirer(deleteDeptQuestion);
         await deleteDepartment(deleteDept);
         selectionFunc();
         break;
       case 'Remove Role':
-        let deleteRoleQuestion = await getQuestions('deleteRole');
-        let deleteRoleAnswer = await inquirer(deleteRoleQuestion);
+        let deleteRoleAnswer = await inquirer(deleteRoleQ);
         await deleteRole(deleteRoleAnswer);
         selectionFunc();
         break;

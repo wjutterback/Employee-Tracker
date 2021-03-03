@@ -8,7 +8,7 @@ const connection = mysql.createConnection({
 });
 
 //Checks MySQL Database for Department, if not found, it creates department and finally returns department ID.
-function department(dept) {
+function addDepartment(dept) {
   return new Promise(function (resolve, reject) {
     loop();
     function loop() {
@@ -243,8 +243,85 @@ function deleteRole(remove) {
   });
 }
 
+function getDept() {
+  return new Promise(function (resolve, reject) {
+    const selectDept = 'SELECT department.name, department.id FROM department';
+    connection.query(selectDept, (err, res) => {
+      if (err) throw err;
+      const deptChoices = [];
+      res.forEach((dept) => {
+        let obj = {};
+        Object.assign(obj, {
+          name: `${dept.name}`,
+        });
+        Object.assign(obj, { value: `${dept.id}` });
+        deptChoices.push(...[obj]);
+      });
+      resolve(deptChoices);
+    });
+  });
+}
+
+function getRole() {
+  return new Promise(function (resolve, reject) {
+    const selectRole =
+      'SELECT DISTINCT(title), role.id  FROM role GROUP BY title;';
+    connection.query(selectRole, (err, res) => {
+      const roleChoices = [];
+      res.forEach((role) => {
+        let obj = {};
+        Object.assign(obj, {
+          name: `${role.title}`,
+        });
+        Object.assign(obj, { value: `${role.id}` });
+        roleChoices.push(...[obj]);
+      });
+      resolve(roleChoices);
+    });
+  });
+}
+
+function getEmployees() {
+  return new Promise(function (resolve, reject) {
+    const selectEmployee =
+      'SELECT employee.first_name, employee.last_name, employee.id FROM employee';
+    connection.query(selectEmployee, (err, res) => {
+      if (err) throw err;
+      const employeeChoices = [];
+      res.forEach((employee) => {
+        let obj = {};
+        Object.assign(obj, {
+          name: `${employee.first_name} ${employee.last_name}`,
+        });
+        Object.assign(obj, { value: `${employee.id}` });
+        employeeChoices.push(...[obj]);
+      });
+      resolve(employeeChoices);
+    });
+  });
+}
+
+function getManagers() {
+  return new Promise(function (resolve, reject) {
+    const selectManager =
+      "SELECT employee.first_name, employee.last_name, employee.id FROM employee LEFT JOIN role ON employee.role_id = role.id WHERE role.title = 'Manager'";
+    connection.query(selectManager, (err, res) => {
+      const managerChoices = [{ name: 'None', value: null }];
+      res.forEach((manager) => {
+        let obj = {};
+        Object.assign(obj, {
+          name: `${manager.first_name} ${manager.last_name}`,
+        });
+        Object.assign(obj, { value: `${manager.id}` });
+        managerChoices.push(...[obj]);
+      });
+      resolve(managerChoices);
+    });
+  });
+}
+
 module.exports = {
-  department: department,
+  addDepartment: addDepartment,
   addRole: addRole,
   updateEmployeeRole: updateEmployeeRole,
   updateEmployeeManager: updateEmployeeManager,
@@ -255,4 +332,8 @@ module.exports = {
   viewBudget: viewBudget,
   deleteDepartment: deleteDepartment,
   deleteRole: deleteRole,
+  getManagers: getManagers,
+  getEmployees: getEmployees,
+  getRole: getRole,
+  getDept: getDept,
 };
