@@ -22,9 +22,8 @@ function addDepartment(dept) {
           valueArray.push(...Object.values(i));
         });
         if (valueArray.indexOf(1) !== -1) {
-          console.log(`${dept.name} department found in database`);
-          const getId = 'SELECT department.id FROM department WHERE name = ?';
-          connection.query(getId, dept.name, (err, res) => {
+          const getId = 'SELECT department.id FROM department WHERE ?';
+          connection.query(getId, { name: dept.name }, (err, res) => {
             if (err) {
               return reject(err);
             }
@@ -44,7 +43,7 @@ function addDepartment(dept) {
               if (err) {
                 return reject(err);
               }
-              console.log(`${res.affectedRows} department added`);
+              console.log(`Department created!`);
               loop();
             }
           );
@@ -109,11 +108,41 @@ function addEmployee(employee) {
   });
 }
 
+//Deletes department
+function deleteDepartment(remove) {
+  return new Promise(function (resolve, reject) {
+    const sql = 'DELETE FROM department WHERE ?';
+    connection.query(sql, { id: remove.dept }, (err, res) => {
+      if (err) {
+        return reject(
+          'Please remove all employees for this department before you delete'
+        );
+      }
+      resolve(console.log(`Department removed`));
+    });
+  });
+}
+
+//Deletes role
+function deleteRole(remove) {
+  return new Promise(function (resolve, reject) {
+    const sql = 'DELETE FROM role WHERE ?';
+    connection.query(sql, { id: remove.role }, (err, res) => {
+      if (err) {
+        return reject(
+          'Please remove or update all employees before you delete this role'
+        );
+      }
+      resolve(console.log(`Role removed`));
+    });
+  });
+}
+
 //Deletes employee from database
 function deleteEmployee(employee) {
   return new Promise(function (resolve, reject) {
-    const sql = 'DELETE FROM employee WHERE employee.id = ?';
-    connection.query(sql, employee.remove, (err, res) => {
+    const sql = 'DELETE FROM employee WHERE ?';
+    connection.query(sql, { id: employee.remove }, (err, res) => {
       if (err) {
         return reject(
           'Please remove all employees for this manager before you delete'
@@ -127,8 +156,11 @@ function deleteEmployee(employee) {
 //Updates employee role
 function updateEmployeeRole(employee) {
   return new Promise(function (resolve, reject) {
-    const employeeRoleId = [employee.updateRole, employee.name];
-    const sql = 'UPDATE role SET role.title = ? WHERE role.id = ?';
+    const employeeRoleId = [
+      { title: employee.updateRole },
+      { id: employee.name },
+    ];
+    const sql = 'UPDATE role SET ? WHERE ?';
     connection.query(sql, employeeRoleId, (err, res) => {
       if (err) {
         return reject(err);
@@ -141,9 +173,11 @@ function updateEmployeeRole(employee) {
 //Updates Employee's Manager
 function updateEmployeeManager(employee) {
   return new Promise(function (resolve, reject) {
-    const updateArr = [employee.updateManager, employee.name];
-    const sql =
-      'UPDATE employee SET employee.manager_id = ? WHERE employee.id = ?';
+    const updateArr = [
+      { manager_id: employee.updateManager },
+      { id: employee.name },
+    ];
+    const sql = 'UPDATE employee SET ? WHERE ?';
     connection.query(sql, updateArr, (err, res) => {
       if (err) {
         return reject(err);
@@ -214,35 +248,7 @@ function viewBudget() {
   });
 }
 
-//Deletes department
-function deleteDepartment(remove) {
-  return new Promise(function (resolve, reject) {
-    const sql = 'DELETE FROM department WHERE department.id = ?';
-    connection.query(sql, remove.dept, (err, res) => {
-      if (err) {
-        return reject(
-          'Please remove all employees for this department before you delete'
-        );
-      }
-      resolve(console.log(`Department removed`));
-    });
-  });
-}
-
-function deleteRole(remove) {
-  return new Promise(function (resolve, reject) {
-    const sql = 'DELETE FROM role WHERE role.id = ?';
-    connection.query(sql, remove.role, (err, res) => {
-      if (err) {
-        return reject(
-          'Please remove or update all employees before you delete this role'
-        );
-      }
-      resolve(console.log(`Role removed`));
-    });
-  });
-}
-
+//Used in inquirer list choice for current departments
 function getDept() {
   return new Promise(function (resolve, reject) {
     const selectDept = 'SELECT department.name, department.id FROM department';
@@ -262,6 +268,7 @@ function getDept() {
   });
 }
 
+//Used in inquirer list choice for current roles
 function getRole() {
   return new Promise(function (resolve, reject) {
     const selectRole =
@@ -281,6 +288,7 @@ function getRole() {
   });
 }
 
+//Used in inquirer list choice for current employees
 function getEmployees() {
   return new Promise(function (resolve, reject) {
     const selectEmployee =
@@ -301,6 +309,7 @@ function getEmployees() {
   });
 }
 
+//Used in inquirer list choice for current managers
 function getManagers() {
   return new Promise(function (resolve, reject) {
     const selectManager =
