@@ -115,7 +115,7 @@ function deleteDepartment(remove) {
     connection.query(sql, { id: remove.dept }, (err, res) => {
       if (err) {
         return reject(
-          'Please remove all employees for this department before you delete'
+          'Please remove all employees from this department before deleting'
         );
       }
       resolve(console.log(`Department removed`));
@@ -130,7 +130,7 @@ function deleteRole(remove) {
     connection.query(sql, { id: remove.role }, (err, res) => {
       if (err) {
         return reject(
-          'Please remove or update all employees before you delete this role'
+          'Please remove or update all employees from this role before deleting'
         );
       }
       resolve(console.log(`Role removed`));
@@ -145,7 +145,7 @@ function deleteEmployee(employee) {
     connection.query(sql, { id: employee.remove }, (err, res) => {
       if (err) {
         return reject(
-          'Please remove all employees for this manager before you delete'
+          'Please remove all employees from this manager before deleting'
         );
       }
       resolve(console.log(`Removed employee from database`));
@@ -192,7 +192,7 @@ function viewEmployee(byDepartment, byManager) {
   return new Promise(function (resolve, reject) {
     if (byDepartment === true) {
       const queryDepartment =
-        "SELECT CONCAT(employee.first_name, ' ', employee.last_name) as 'Employee Name', department.name AS 'Department' FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id ORDER BY Department ASC";
+        "SELECT CONCAT(employee.first_name, ' ', employee.last_name) AS 'Employee Name', department.name AS 'Department' FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id ORDER BY Department, employee.last_name;";
       connection.query(queryDepartment, (err, res) => {
         if (err) {
           return reject(err);
@@ -201,7 +201,7 @@ function viewEmployee(byDepartment, byManager) {
       });
     } else if (byManager === true) {
       const queryManager =
-        "SELECT CONCAT(employee1.first_name, ' ', employee1.last_name) as 'Employee Name', CONCAT(employee.first_name, ' ', employee.last_name) AS 'Manager' FROM employee as employee1 INNER JOIN employee ON employee1.manager_id = employee.id ORDER BY Manager ASC;";
+        "SELECT CONCAT(employee1.first_name, ' ', employee1.last_name) AS 'Employee Name', CONCAT(employee.first_name, ' ', employee.last_name) AS 'Manager' FROM employee as employee1 INNER JOIN employee ON employee1.manager_id = employee.id ORDER BY Manager, employee.last_name;";
       connection.query(queryManager, (err, res) => {
         if (err) {
           return reject(err);
@@ -210,7 +210,7 @@ function viewEmployee(byDepartment, byManager) {
       });
     } else {
       const queryAll =
-        "SELECT CONCAT(employee.first_name, ' ', employee.last_name) as 'Employee Name', department.name AS 'Department', role.title AS 'Title', role.salary AS 'Salary', CONCAT(employee1.first_name, ' ', employee1.last_name) AS 'Manager' FROM employee LEFT JOIN employee AS employee1 ON employee.manager_id = employee1.id LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id ORDER BY employee.last_name ASC;";
+        "SELECT CONCAT(employee.first_name, ' ', employee.last_name) AS 'Employee Name', department.name AS 'Department', role.title AS 'Title', role.salary AS 'Salary', CONCAT(employee1.first_name, ' ', employee1.last_name) AS 'Manager' FROM employee LEFT JOIN employee AS employee1 ON employee.manager_id = employee1.id LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id ORDER BY employee.last_name;";
       connection.query(queryAll, (err, res) => {
         if (err) {
           return reject(err);
